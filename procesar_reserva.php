@@ -179,12 +179,12 @@ try {
         ]);
     }
     
-    // ✅ ACTUALIZAR STOCK (reducir las cantidades)
+    /* ✅ ACTUALIZAR STOCK (reducir las cantidades)
     $stmt_stock = $db->pdo->prepare("
         UPDATE articulo 
         SET stock = stock - ? 
         WHERE id = ?
-    ");
+    "); */
     
     foreach ($detalles as $detalle) {
         $stmt_stock->execute([
