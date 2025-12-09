@@ -1,9 +1,8 @@
 <?php
 // login.php
 // Formulario de inicio de sesión
+session_start(); // Si no se inicia en otro lugar
 
-$page_title = "Iniciar Sesión";
-require_once __DIR__ . '/includes/header.php';
 include ("includes/conexion_nube.php");
 require_once __DIR__ . '/includes/cliente.php';
 
@@ -57,6 +56,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 }
+$page_title = "Iniciar Sesión";
+require_once __DIR__ . '/includes/header.php';
 ?>
 
 <div class="login-container">
