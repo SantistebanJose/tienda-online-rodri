@@ -184,14 +184,14 @@ try {
         UPDATE articulo 
         SET stock = stock - ? 
         WHERE id = ?
-    "); */
+    "); 
     
     foreach ($detalles as $detalle) {
         $stmt_stock->execute([
             $detalle['cantidad'],
             $detalle['articulo_id']
         ]);
-    }
+    } */
     
     // Confirmar transacción
     $db->pdo->commit();
