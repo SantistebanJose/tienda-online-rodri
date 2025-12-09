@@ -1,24 +1,32 @@
 <?php
-// login.php
-// Formulario de inicio de sesión
+// login.php - Formulario de inicio de sesión (CORREGIDO)
 
-$page_title = "Iniciar Sesión";
-require_once __DIR__ . '/includes/header.php';
-include ("includes/conexion_nube.php");
-require_once __DIR__ . '/includes/cliente.php';
+// ============================================
+// PASO 1: INICIAR SESIÓN (si no está iniciada en header.php)
+// ============================================
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-$mensaje = '';
-$identificador = '';
-
-// Si el usuario ya está logeado, redirigir al catálogo
+// ============================================
+// PASO 2: VERIFICAR SI YA ESTÁ LOGUEADO (ANTES DE CUALQUIER HTML)
+// ============================================
 if (isset($_SESSION['cliente_id'])) {
     header('Location: index.php');
     exit;
 }
 
+// ============================================
+// PASO 3: PROCESAR EL FORMULARIO (ANTES DE CUALQUIER HTML)
+// ============================================
+$mensaje = '';
+$identificador = '';
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // USAR LA CONEXIÓN CENTRALIZADA (includes/db.php)
+    // USAR LA CONEXIÓN CENTRALIZADA
     require_once 'includes/db.php';
+    require_once __DIR__ . '/includes/cliente.php';
+    
     $database = new DB();
     $clienteManager = new Cliente($database->pdo);
 
@@ -57,6 +65,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 }
+
+// ============================================
+// PASO 4: AHORA SÍ, INCLUIR EL HEADER (DESPUÉS DE TODA LA LÓGICA)
+// ============================================
+$page_title = "Iniciar Sesión";
+require_once __DIR__ . '/includes/header.php';
+include("includes/conexion_nube.php");
 ?>
 
 <div class="login-container">
