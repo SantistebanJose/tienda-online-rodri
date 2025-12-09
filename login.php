@@ -1,9 +1,13 @@
 <?php
 // login.php
 // Formulario de inicio de sesión
-session_start(); // Si no se inicia en otro lugar
 
-include ("includes/conexion_nube.php");
+// Iniciar sesión solo si no hay una activa
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+include("includes/conexion_nube.php");
 require_once __DIR__ . '/includes/cliente.php';
 
 $mensaje = '';
@@ -15,6 +19,7 @@ if (isset($_SESSION['cliente_id'])) {
     exit;
 }
 
+// PROCESAR EL LOGIN ANTES DE INCLUIR EL HEADER
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // USAR LA CONEXIÓN CENTRALIZADA (includes/db.php)
     require_once 'includes/db.php';
@@ -56,6 +61,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 }
+
+// AHORA SÍ INCLUIR EL HEADER (después de procesar todo)
 $page_title = "Iniciar Sesión";
 require_once __DIR__ . '/includes/header.php';
 ?>

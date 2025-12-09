@@ -1,6 +1,10 @@
 <?php
 // includes/header.php
-session_start();
+
+// Iniciar sesión solo si no hay una activa
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Cargar la clase DB automáticamente
 require_once __DIR__ . '/db.php';
