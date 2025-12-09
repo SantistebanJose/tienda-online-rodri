@@ -1,6 +1,9 @@
 <?php
 // includes/header.php
-session_start();
+// LÍNEA 3 CORREGIDA: Solo iniciar sesión si no está activa
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Cargar la clase DB automáticamente
 require_once __DIR__ . '/db.php';
