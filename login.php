@@ -4,7 +4,9 @@
 // ============================================
 // PASO 1: INICIAR SESIÓN PRIMERO (ANTES DE TODO)
 // ============================================
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // ============================================
 // PASO 2: VERIFICAR SI YA ESTÁ LOGUEADO (ANTES DE CUALQUIER HTML)
