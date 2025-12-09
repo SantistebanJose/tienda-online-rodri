@@ -28,6 +28,8 @@ if (isset($_SESSION['cart']) && is_array($_SESSION['cart'])) {
     <link rel="stylesheet" href="assets/css/estilos_prodyserv.css">
     <link rel="stylesheet" href="assets/css/carrito.css">
     <link rel="stylesheet" href="assets/css/producto-detalle.css">
+    <link rel="stylesheet" href="assets/css/catalog.css">
+
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">

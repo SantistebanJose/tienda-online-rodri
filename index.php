@@ -1,5 +1,5 @@
 <?php
-// index.php - Catálogo Mejorado con Filtros Laterales, Paginación e Imágenes Dinámicas
+// index.php - Catálogo Mejorado con Filtros Laterales, Paginación, Imágenes Dinámicas y NOVEDADES DESTACADAS
 
 $page_title = "Catálogo de Artículos y Servicios";
 require_once 'includes/header.php';
@@ -50,6 +50,35 @@ $filtro_precio_max = isset($_GET['precio_max']) ? $_GET['precio_max'] : '';
 $filtro_busqueda = isset($_GET['buscar']) ? trim($_GET['buscar']) : '';
 // Por defecto mostrar solo artículos
 $mostrar = isset($_GET['mostrar']) ? $_GET['mostrar'] : 'articulos';
+
+// ============================================
+// OBTENER PRODUCTOS DESTACADOS/NOVEDADES
+// ============================================
+$productos_destacados = [];
+$mostrar_destacados = ($mostrar === 'articulos' && empty($filtro_busqueda) && empty($filtro_categoria) && empty($filtro_marca) && empty($filtro_precio_min) && empty($filtro_precio_max));
+
+if ($mostrar_destacados) {
+    try {
+        $sql_destacados = "
+            SELECT 
+                a.id, a.nombre, a.precio_venta, a.stock, a.marca, a.categoria_id,
+                a.json_url_img, a.es_novedad, a.fecha_novedad,
+                c.descripcion as categoria_nombre 
+            FROM articulo a
+            LEFT JOIN categoria c ON a.categoria_id = c.id
+            WHERE a.es_novedad = TRUE 
+            AND a.stock > 0 
+            AND a.deleted_at IS NULL
+            ORDER BY a.orden_destacado DESC, a.fecha_novedad DESC
+            LIMIT 6
+        ";
+        
+        $stmt_destacados = $db->pdo->query($sql_destacados);
+        $productos_destacados = $stmt_destacados->fetchAll();
+    } catch (PDOException $e) {
+        $productos_destacados = [];
+    }
+}
 
 // ============================================
 // OBTENER SERVICIOS (CON PAGINACIÓN)
@@ -179,6 +208,321 @@ if (!empty($filtro_precio_max)) $filtros_activos++;
 if ($mostrar !== 'articulos') $filtros_activos++;
 ?>
 
+<style>
+/* ============================================
+   SECCIÓN DE PRODUCTOS DESTACADOS/NOVEDADES
+   ============================================ */
+.featured-section {
+    margin: 2rem 0 3rem;
+    padding: 2.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.featured-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse-bg 4s ease-in-out infinite;
+}
+
+@keyframes pulse-bg {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.3; }
+}
+
+.featured-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.featured-title-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 0.8rem;
+    flex-wrap: wrap;
+}
+
+.featured-badge {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    color: white;
+    padding: 0.5rem 1.2rem;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    animation: bounce-badge 2s infinite;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+@keyframes bounce-badge {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-5px) scale(1.05); }
+}
+
+.featured-header h2 {
+    color: white;
+    margin: 0;
+    font-size: 2.2rem;
+    font-weight: 700;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.featured-subtitle {
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 1.15rem;
+    margin: 0;
+    font-weight: 300;
+}
+
+.featured-products-carousel {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.featured-product-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+}
+
+.featured-product-card:hover {
+    transform: translateY(-12px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+}
+
+.featured-label {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    color: white;
+    padding: 0.4rem 1rem;
+    border-radius: 25px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    z-index: 2;
+    box-shadow: 0 3px 12px rgba(255, 107, 107, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    animation: pulse-label 2s infinite;
+}
+
+@keyframes pulse-label {
+    0%, 100% { box-shadow: 0 3px 12px rgba(255, 107, 107, 0.5); }
+    50% { box-shadow: 0 3px 20px rgba(255, 107, 107, 0.8); }
+}
+
+.featured-image-link {
+    display: block;
+    position: relative;
+    overflow: hidden;
+}
+
+.featured-product-image {
+    width: 100%;
+    height: 280px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    position: relative;
+}
+
+.featured-product-image::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.05) 100%);
+    pointer-events: none;
+}
+
+.featured-product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.featured-product-card:hover .featured-product-image img {
+    transform: scale(1.15) rotate(2deg);
+}
+
+.featured-product-info {
+    padding: 1.5rem;
+}
+
+.featured-title-link {
+    text-decoration: none;
+    color: inherit;
+    transition: color 0.3s ease;
+}
+
+.featured-product-info h3 {
+    color: #2c3e50;
+    font-size: 1.1rem;
+    margin: 0 0 0.8rem;
+    font-weight: 600;
+    min-height: 2.6rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.3;
+}
+
+.featured-title-link:hover h3 {
+    color: #667eea;
+}
+
+.featured-category {
+    display: inline-block;
+    background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+    color: #495057;
+    padding: 0.35rem 0.9rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+.featured-price-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 1.2rem 0;
+    padding: 0.8rem 0;
+    border-top: 1px solid #e9ecef;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.featured-price {
+    font-size: 1.6rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.featured-stock {
+    font-size: 0.85rem;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: #f8f9fa;
+    padding: 0.3rem 0.8rem;
+    border-radius: 12px;
+}
+
+.btn-add-cart-featured {
+    width: 100%;
+    padding: 0.9rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-add-cart-featured:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+.btn-add-cart-featured:active {
+    transform: translateY(-1px);
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .featured-products-carousel {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .featured-section {
+        padding: 1.8rem;
+        border-radius: 15px;
+        margin: 1.5rem 0 2rem;
+    }
+    
+    .featured-header h2 {
+        font-size: 1.7rem;
+    }
+    
+    .featured-subtitle {
+        font-size: 1rem;
+    }
+    
+    .featured-products-carousel {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1.2rem;
+    }
+    
+    .featured-product-image {
+        height: 220px;
+    }
+    
+    .featured-product-info {
+        padding: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .featured-section {
+        padding: 1.2rem;
+    }
+    
+    .featured-header {
+        margin-bottom: 1.5rem;
+    }
+    
+    .featured-header h2 {
+        font-size: 1.4rem;
+    }
+    
+    .featured-products-carousel {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .featured-product-image {
+        height: 250px;
+    }
+}
+</style>
+
 <div class="catalog-container">
     <!-- ============================================
          SIDEBAR DE FILTROS
@@ -302,6 +646,64 @@ if ($mostrar !== 'articulos') $filtros_activos++;
                 </button>
             </form>
         </div>
+        
+        <!-- ============================================
+             SECCIÓN DE NOVEDADES DESTACADAS
+             ============================================ -->
+        <?php if (!empty($productos_destacados) && $mostrar_destacados): ?>
+        <div class="featured-section">
+            <div class="featured-header">
+                <div class="featured-title-wrapper">
+                    <span class="featured-badge">🔥 NUEVO</span>
+                    <h2>Productos Destacados</h2>
+                </div>
+                <p class="featured-subtitle">¡Descubre nuestras últimas novedades y productos más populares!</p>
+            </div>
+            
+            <div class="featured-products-carousel">
+                <?php foreach ($productos_destacados as $articulo): 
+                    $imagenes = procesarImagenesArticulo($articulo['json_url_img']);
+                    $primera_imagen = !empty($imagenes) ? $imagenes[0]['url'] : 'assets/img/productos/placeholder.jpg';
+                ?>
+                    <div class="featured-product-card">
+                        <span class="featured-label">NOVEDAD</span>
+                        
+                        <a href="producto_detalle.php?id=<?= $articulo['id'] ?>" class="featured-image-link">
+                            <div class="featured-product-image">
+                                <img src="<?= htmlspecialchars($primera_imagen) ?>" 
+                                     alt="<?= htmlspecialchars($articulo['nombre']) ?>"
+                                     loading="lazy"
+                                     onerror="this.src='assets/img/no-image.png'">
+                            </div>
+                        </a>
+                        
+                        <div class="featured-product-info">
+                            <a href="producto_detalle.php?id=<?= $articulo['id'] ?>" class="featured-title-link">
+                                <h3><?= htmlspecialchars($articulo['nombre']) ?></h3>
+                            </a>
+                            
+                            <?php if (!empty($articulo['categoria_nombre'])): ?>
+                                <span class="featured-category">
+                                    <?= htmlspecialchars($articulo['categoria_nombre']) ?>
+                                </span>
+                            <?php endif; ?>
+                            
+                            <div class="featured-price-section">
+                                <span class="featured-price">S/. <?= number_format($articulo['precio_venta'], 2) ?></span>
+                                <span class="featured-stock">
+                                    <i class="fas fa-box"></i> Stock: <?= $articulo['stock'] ?>
+                                </span>
+                            </div>
+                            
+                            <button class="btn-add-cart-featured" data-id="<?= $articulo['id'] ?>" data-tipo="articulo">
+                                <i class="fas fa-cart-plus"></i> Añadir al carrito
+                            </button>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php endif; ?>
         
         <!-- Información de resultados -->
         <div class="results-header">
@@ -683,14 +1085,46 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }, { passive: true });
     });
-});
-// Agregar este script al final de index.php, antes del cierre de </body>
-
-document.addEventListener('DOMContentLoaded', function() {
     
-    // Función para manejar errores de carga de imágenes
+    // ============================================
+    // MANEJAR BOTONES "AÑADIR AL CARRITO" DE PRODUCTOS DESTACADOS
+    // ============================================
+    document.querySelectorAll('.btn-add-cart-featured').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const id = this.dataset.id;
+            const tipo = this.dataset.tipo;
+            
+            // Mostrar feedback visual
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Agregando...';
+            this.disabled = true;
+            
+            // Simular agregado al carrito (ajusta según tu implementación)
+            setTimeout(() => {
+                this.innerHTML = '<i class="fas fa-check"></i> ¡Agregado!';
+                this.style.background = 'linear-gradient(135deg, #51cf66 0%, #37b24d 100%)';
+                
+                // Restaurar después de 2 segundos
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                    this.style.background = '';
+                    this.disabled = false;
+                }, 2000);
+                
+                // Actualizar contador del carrito
+                updateFloatingCartBadge();
+            }, 500);
+            
+            console.log(`Añadiendo ${tipo} con ID ${id} al carrito desde destacados`);
+        });
+    });
+    
+    // ============================================
+    // FUNCIÓN PARA MANEJAR ERRORES DE CARGA DE IMÁGENES
+    // ============================================
     function setupImageFallback() {
-        const images = document.querySelectorAll('.carousel-image, .preview-image, .product-image img');
+        const images = document.querySelectorAll('.carousel-image, .preview-image, .product-image img, .featured-product-image img');
         
         images.forEach(img => {
             // Solo procesar una vez
@@ -740,7 +1174,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupImageFallback();
     
     // También configurar para imágenes que se cargan dinámicamente
-    const observer = new MutationObserver(function(mutations) {
+    const observerImages = new MutationObserver(function(mutations) {
         mutations.forEach(function(mutation) {
             if (mutation.addedNodes.length) {
                 setupImageFallback();
@@ -751,7 +1185,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Observar cambios en el contenedor de productos
     const productsContainer = document.querySelector('.products-grid');
     if (productsContainer) {
-        observer.observe(productsContainer, {
+        observerImages.observe(productsContainer, {
             childList: true,
             subtree: true
         });
@@ -769,8 +1203,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     };
     
-    console.log('✅ Sistema de fallback de imágenes de Drive activado');
-    console.log('💡 Si las imágenes no cargan, ejecuta: reloadDriveImages()');
+    console.log('✅ Sistema completo de catálogo con novedades activado');
+    console.log('🔥 Productos destacados cargados:', document.querySelectorAll('.featured-product-card').length);
 });
 </script>
 
