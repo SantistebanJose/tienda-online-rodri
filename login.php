@@ -2,11 +2,9 @@
 // login.php - Formulario de inicio de sesión (CORREGIDO)
 
 // ============================================
-// PASO 1: INICIAR SESIÓN (si no está iniciada en header.php)
+// PASO 1: INICIAR SESIÓN PRIMERO (ANTES DE TODO)
 // ============================================
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+session_start();
 
 // ============================================
 // PASO 2: VERIFICAR SI YA ESTÁ LOGUEADO (ANTES DE CUALQUIER HTML)
