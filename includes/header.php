@@ -40,14 +40,18 @@ if (isset($_SESSION['cart']) && is_array($_SESSION['cart'])) {
     <meta name="author" content="Librería Bazar Rodri">
     
     <!-- Favicon (opcional) -->
-    <link rel="icon" type="image/x-icon" href="assets/img/favicon.ico">
+   <!-- Favicon para diferentes dispositivos -->
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/img/logo.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/img/logo.png">
+    <link rel="shortcut icon" href="assets/img/logo.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/img/logo.png">
 </head>
 <body>
     <header class="main-header">
         <nav class="navbar">
             <div class="nav-container">
                 <a href="index.php" class="logo">
-                    <i class="fas fa-book-open"></i>
+                    <img src="assets/img/logo.png" alt="Librería Bazar Rodri" class="logo-img">
                     <span>Librería Bazar Rodri</span>
                 </a>
                 

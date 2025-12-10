@@ -1,7 +1,7 @@
 <?php
 // index.php - Catálogo Mejorado con Filtros Laterales, Paginación, Imágenes Dinámicas y NOVEDADES DESTACADAS
 
-$page_title = "Catálogo de Artículos y Servicios";
+$page_title = "Librería Bazar Rodri";
 require_once 'includes/header.php';
 require_once 'includes/functions.php';
 

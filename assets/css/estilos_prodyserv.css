@@ -3574,6 +3574,25 @@ html {
 
 
 
+
+.logo-img {
+    height: 60px;  /* Reduce de ~300px a 50px */
+    width: auto;
+    object-fit: contain;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Para móviles */
+@media (max-width: 768px) {
+    .logo-img {
+        height: 40px;
+    }
+}
 /* ============================================
    CARRUSEL DE NOVEDADES EN LA PÁGINA PRINCIPAL
    ============================================ */
