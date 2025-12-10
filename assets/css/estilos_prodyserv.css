@@ -3593,6 +3593,39 @@ html {
         height: 40px;
     }
 }
+
+/* Estilos para el logo en el footer */
+.footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.footer-logo-img {
+    height: 60px;
+    width: auto;
+    object-fit: contain;
+}
+
+.footer-logo h3 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+    .footer-logo {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .footer-logo-img {
+        height: 50px;
+    }
+}
 /* ============================================
    CARRUSEL DE NOVEDADES EN LA PÁGINA PRINCIPAL
    ============================================ */

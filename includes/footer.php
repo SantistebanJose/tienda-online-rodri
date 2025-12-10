@@ -5,7 +5,10 @@
     <footer class="main-footer">
         <div class="footer-container">
             <div class="footer-section">
-                <h3><i class="fas fa-book-open"></i> Librería Bazar Rodri</h3>
+                <div class="footer-logo">
+                    <img src="assets/img/logo.png" alt="Librería Bazar Rodri" class="footer-logo-img">
+                    <h3>Librería Bazar Rodri</h3>
+                </div>
                 <p>Tu tienda de confianza para libros, útiles escolares y más.</p>
             </div>
             
