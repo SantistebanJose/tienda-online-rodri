@@ -1,5 +1,8 @@
 <?php
 // index.php - Catálogo Mejorado con Filtros Laterales, Paginación, Imágenes Dinámicas y NOVEDADES DESTACADAS
+// ✅ ACTUALIZADO: Usa disponibilidad_venta_fh para control de visibilidad
+// ✅ Solo muestra productos con disponibilidad_venta_fh = NULL (disponibles)
+// ✅ Oculta productos con timestamp en disponibilidad_venta_fh (bloqueados desde POS)
 
 $page_title = "Librería Bazar Rodri";
 require_once 'includes/header.php';
@@ -31,10 +34,18 @@ try {
     $categorias = [];
 }
 
-// Obtener marcas únicas
+// Obtener marcas únicas (solo de productos disponibles)
 $marcas = [];
 try {
-    $stmt = $db->pdo->query("SELECT DISTINCT marca FROM articulo WHERE marca IS NOT NULL AND TRIM(marca) != '' AND deleted_at IS NULL ORDER BY marca");
+    $stmt = $db->pdo->query("
+        SELECT DISTINCT marca 
+        FROM articulo 
+        WHERE marca IS NOT NULL 
+        AND TRIM(marca) != '' 
+        AND disponibilidad_venta_fh IS NULL
+        AND deleted_at IS NULL 
+        ORDER BY marca
+    ");
     $marcas = $stmt->fetchAll();
 } catch (PDOException $e) {
     $marcas = [];
@@ -53,6 +64,9 @@ $mostrar = isset($_GET['mostrar']) ? $_GET['mostrar'] : 'articulos';
 
 // ============================================
 // OBTENER PRODUCTOS DESTACADOS/NOVEDADES
+// ✅ ACTUALIZADO: Usa disponibilidad_venta_fh
+// Solo muestra cuando disponibilidad_venta_fh es NULL (disponible)
+// Oculta cuando tiene timestamp (bloqueado desde POS)
 // ============================================
 $productos_destacados = [];
 $mostrar_destacados = ($mostrar === 'articulos' && empty($filtro_busqueda) && empty($filtro_categoria) && empty($filtro_marca) && empty($filtro_precio_min) && empty($filtro_precio_max));
@@ -68,6 +82,7 @@ if ($mostrar_destacados) {
             LEFT JOIN categoria c ON a.categoria_id = c.id
             WHERE a.es_novedad = TRUE 
             AND a.stock > 0 
+            AND a.disponibilidad_venta_fh IS NULL
             AND a.deleted_at IS NULL
             ORDER BY a.orden_destacado DESC, a.fecha_novedad DESC
             LIMIT 6
@@ -121,6 +136,9 @@ if ($mostrar === 'servicios') {
 
 // ============================================
 // OBTENER ARTÍCULOS CON FILTROS (CON PAGINACIÓN)
+// ✅ ACTUALIZADO: Usa disponibilidad_venta_fh
+// Solo muestra cuando disponibilidad_venta_fh es NULL (disponible)
+// Oculta cuando tiene timestamp (bloqueado desde POS)
 // ============================================
 $articulos = [];
 $total_articulos = 0;
@@ -130,7 +148,9 @@ if ($mostrar === 'articulos') {
         $sql_count = "
             SELECT COUNT(*) 
             FROM articulo a
-            WHERE a.stock > 0 AND a.deleted_at IS NULL
+            WHERE a.stock > 0 
+            AND a.disponibilidad_venta_fh IS NULL
+            AND a.deleted_at IS NULL
         ";
         
         $params = [];
@@ -173,7 +193,9 @@ if ($mostrar === 'articulos') {
                 c.descripcion as categoria_nombre 
             FROM articulo a
             LEFT JOIN categoria c ON a.categoria_id = c.id
-            WHERE a.stock > 0 AND a.deleted_at IS NULL
+            WHERE a.stock > 0 
+            AND a.disponibilidad_venta_fh IS NULL
+            AND a.deleted_at IS NULL
         ";
         
         if (!empty($where_clauses)) {
