@@ -543,7 +543,379 @@ if ($mostrar !== 'articulos') $filtros_activos++;
         height: 250px;
     }
 }
+
+/* ============================================
+   MODAL DE ANIVERSARIO - LIBRERÍA BAZAR RODRI
+   ============================================ */
+.anniversary-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(30, 58, 95, 0.85);
+    z-index: 99999;
+    backdrop-filter: blur(8px);
+    animation: fadeInOverlay 0.4s ease;
+}
+
+.anniversary-modal-overlay.active {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+}
+
+@keyframes fadeInOverlay {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.anniversary-modal {
+    background: white;
+    border-radius: 25px;
+    max-width: 550px;
+    width: 100%;
+    position: relative;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+    animation: modalPopIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    overflow: hidden;
+}
+
+@keyframes modalPopIn {
+    0% {
+        transform: scale(0.3) translateY(-100px);
+        opacity: 0;
+    }
+    60% {
+        transform: scale(1.05) translateY(0);
+    }
+    100% {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+}
+
+.anniversary-modal-content {
+    padding: 3rem 2.5rem;
+    text-align: center;
+}
+
+.anniversary-logo {
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 2rem;
+    background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+    animation: logoFloat 3s ease-in-out infinite;
+    position: relative;
+    padding: 1rem;
+}
+
+.anniversary-logo::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+    opacity: 0.3;
+    animation: logoPulse 2s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(3deg); }
+}
+
+@keyframes logoPulse {
+    0%, 100% { transform: scale(1); opacity: 0.3; }
+    50% { transform: scale(1.2); opacity: 0.1; }
+}
+
+.anniversary-logo img {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    position: relative;
+    z-index: 1;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
+}
+
+@media (max-width: 768px) {
+    .anniversary-logo {
+        width: 110px;
+        height: 110px;
+    }
+    
+    .anniversary-logo img {
+        width: 70px;
+        height: 70px;
+    }
+}
+@keyframes badgeBounce {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-3px) scale(1.05); }
+}
+
+.anniversary-title {
+    color: #1e3a5f;
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin: 0 0 1rem 0;
+    line-height: 1.3;
+}
+
+.anniversary-subtitle {
+    color: #3b82f6;
+    font-size: 1.4rem;
+    font-weight: 500;
+    margin: 0 0 1.5rem 0;
+    font-style: italic;
+}
+
+.anniversary-description {
+    color: #555;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin: 0 0 2.5rem 0;
+    padding: 0 1rem;
+}
+
+.anniversary-features {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+}
+
+.anniversary-feature {
+    flex: 1;
+    min-width: 120px;
+    text-align: center;
+}
+
+.anniversary-feature-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.anniversary-feature-text {
+    color: #1e3a5f;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.anniversary-cta {
+    background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+    color: white;
+    border: none;
+    padding: 1rem 3rem;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.anniversary-cta:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.6);
+    background: linear-gradient(135deg, #2563eb 0%, #1e3a5f 100%);
+}
+
+.anniversary-cta:active {
+    transform: translateY(-1px);
+}
+
+/* Confeti */
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    opacity: 0;
+    animation: confettiFall 4s linear infinite;
+}
+
+.confetti:nth-child(1) { left: 10%; animation-delay: 0s; background: #3b82f6; }
+.confetti:nth-child(2) { left: 20%; animation-delay: 0.5s; background: #60a5fa; }
+.confetti:nth-child(3) { left: 30%; animation-delay: 1s; background: #f59e0b; }
+.confetti:nth-child(4) { left: 40%; animation-delay: 1.5s; background: #1e40af; }
+.confetti:nth-child(5) { left: 50%; animation-delay: 2s; background: #3b82f6; }
+.confetti:nth-child(6) { left: 60%; animation-delay: 2.5s; background: #60a5fa; }
+.confetti:nth-child(7) { left: 70%; animation-delay: 3s; background: #f59e0b; }
+.confetti:nth-child(8) { left: 80%; animation-delay: 3.5s; background: #1e40af; }
+.confetti:nth-child(9) { left: 90%; animation-delay: 0.2s; background: #3b82f6; }
+.confetti:nth-child(10) { left: 15%; animation-delay: 1.2s; background: #60a5fa; }
+
+@keyframes confettiFall {
+    0% {
+        top: -10%;
+        opacity: 1;
+        transform: rotate(0deg);
+    }
+    100% {
+        top: 110%;
+        opacity: 0;
+        transform: rotate(720deg);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .anniversary-modal {
+        border-radius: 20px;
+    }
+    
+    .anniversary-modal-content {
+        padding: 2.5rem 2rem;
+    }
+    
+    .anniversary-logo {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .anniversary-logo i {
+        font-size: 3rem;
+    }
+    
+    .anniversary-title {
+        font-size: 1.8rem;
+    }
+    
+    .anniversary-subtitle {
+        font-size: 1.2rem;
+    }
+    
+    .anniversary-description {
+        font-size: 1rem;
+        padding: 0;
+    }
+    
+    .anniversary-features {
+        gap: 1rem;
+    }
+    
+    .anniversary-cta {
+        padding: 0.9rem 2.5rem;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .anniversary-modal-content {
+        padding: 2rem 1.5rem;
+    }
+    
+    .anniversary-logo {
+        width: 90px;
+        height: 90px;
+    }
+    
+    .anniversary-logo i {
+        font-size: 2.5rem;
+    }
+    
+    .anniversary-title {
+        font-size: 1.6rem;
+    }
+    
+    .anniversary-subtitle {
+        font-size: 1.1rem;
+    }
+    
+    .anniversary-badge {
+        font-size: 0.8rem;
+        padding: 0.4rem 1.2rem;
+    }
+    
+    .anniversary-features {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .anniversary-feature {
+        min-width: auto;
+    }
+}
 </style>
+<!-- Modal de Aniversario - 3 Años Librería Bazar Rodri -->
+<div class="anniversary-modal-overlay" id="anniversaryModalOverlay">
+    <!-- Confeti decorativo -->
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    
+    <div class="anniversary-modal">
+        <div class="anniversary-modal-content">
+            <!-- Logo con birrete -->
+            <div class="anniversary-logo">
+                <img src="assets/img/logo.png" alt="Librería Bazar Rodri">
+            </div>
+            
+            <!-- Badge de aniversario -->
+            <span class="anniversary-badge">🎉 Celebrando 3 Años</span>
+            
+            <!-- Título principal -->
+            <h2 class="anniversary-title">
+                ¡3 años acompañando<br>tu aprendizaje!
+            </h2>
+            
+            <!-- Subtítulo/Slogan -->
+            <p class="anniversary-subtitle">
+                Más que útiles, acompañamos tu aprendizaje
+            </p>
+            
+            <!-- Descripción -->
+            <p class="anniversary-description">
+                Gracias por ser parte de nuestra historia. Durante estos 3 años 
+                hemos crecido juntos, ofreciéndote los mejores productos para tu 
+                educación. ¡Explorá nuestro catálogo renovado!
+            </p>
+            
+            <!-- Características destacadas 
+            <div class="anniversary-features">
+                <div class="anniversary-feature">
+                    <div class="anniversary-feature-icon">📚</div>
+                    <div class="anniversary-feature-text">Amplio<br>Catálogo</div>
+                </div>
+                <div class="anniversary-feature">
+                    <div class="anniversary-feature-icon">✨</div>
+                    <div class="anniversary-feature-text">Calidad<br>Premium</div>
+                </div>
+                <div class="anniversary-feature">
+                    <div class="anniversary-feature-icon">🎯</div>
+                    <div class="anniversary-feature-text">Mejores<br>Precios</div>
+                </div>
+            </div> -->
+            
+            <!-- Botón de acción -->
+            <button class="anniversary-cta" onclick="cerrarModalAniversario()">
+                Continuar
+            </button>
+        </div>
+    </div>
+</div>
 
 <div class="catalog-container">
     <!-- ============================================
@@ -1227,6 +1599,57 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('✅ Sistema completo de catálogo con novedades activado');
     console.log('🔥 Productos destacados cargados:', document.querySelectorAll('.featured-product-card').length);
+});
+
+// ============================================
+// MODAL DE ANIVERSARIO - 3 AÑOS
+// ============================================
+function mostrarModalAniversario() {
+    const overlay = document.getElementById('anniversaryModalOverlay');
+    if (overlay) {
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function cerrarModalAniversario() {
+    const overlay = document.getElementById('anniversaryModalOverlay');
+    if (overlay) {
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+        // Guardar que ya vio el modal en esta sesión
+        sessionStorage.setItem('anniversaryModalShown', 'true');
+    }
+}
+
+// Agregar esto DENTRO del bloque document.addEventListener('DOMContentLoaded', function() { ... })
+// que ya existe en tu index.php (aproximadamente en la línea 750)
+
+// Inicializar modal de aniversario
+const anniversaryOverlay = document.getElementById('anniversaryModalOverlay');
+
+if (anniversaryOverlay) {
+    // Cerrar al hacer clic en el fondo oscuro
+    anniversaryOverlay.addEventListener('click', function(e) {
+        if (e.target === anniversaryOverlay) {
+            cerrarModalAniversario();
+        }
+    });
+    
+    // Mostrar automáticamente solo si no se ha mostrado en esta sesión
+    if (!sessionStorage.getItem('anniversaryModalShown')) {
+        // Esperar 1 segundo después de cargar la página
+        setTimeout(function() {
+            mostrarModalAniversario();
+        }, 1000);
+    }
+}
+
+// Cerrar con tecla Escape (agregar al evento keydown existente o crear uno nuevo)
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        cerrarModalAniversario();
+    }
 });
 </script>
 
