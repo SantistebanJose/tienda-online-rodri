@@ -39,7 +39,7 @@ if (isset($_SESSION['cart']) && is_array($_SESSION['cart'])) {
     <meta name="keywords" content="librería, útiles escolares, libros, bazar, papelería">
     <meta name="author" content="Librería Bazar Rodri">
 
-
+    <meta name="google-adsense-account" content="ca-pub-1261028803938105">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1261028803938105"
      crossorigin="anonymous"></script>
     
