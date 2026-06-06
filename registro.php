@@ -87,7 +87,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $tipo_mensaje = 'exito';
                     
                     // Auto-login o redirigir
-                    header("refresh:3;url=login.php");
+                    $redirigir = 'login.php';
                 } else {
                     $mensaje = 'Error al activar tu cuenta. Por favor intenta más tarde.';
                     $tipo_mensaje = 'error';
@@ -105,16 +105,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($nuevo_id) {
                 $mensaje = '¡Registro exitoso! Tu cuenta ha sido creada. Redirigiendo al inicio de sesión...';
                 $tipo_mensaje = 'exito';
-                
-                // Limpiar datos
+                $redirigir = 'login.php';
                 $datos = ['dni'=>'', 'nombres'=>'', 'apellidos'=>'', 'email'=>'', 'telefono'=>'', 'direccion'=>''];
-                header("refresh:2;url=login.php");
             } else {
                 $mensaje = 'Error: No se pudo completar el registro. Intenta nuevamente o contacta al administrador.';
                 $tipo_mensaje = 'error';
             }
         }
-    }
+    
 }
 ?>
 
@@ -130,6 +128,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <i class="fas <?= $tipo_mensaje === 'exito' ? 'fa-check-circle' : 'fa-exclamation-triangle' ?>"></i>
             <span><?= $mensaje ?></span>
         </div>
+    <?php endif; ?>
+    <?php if ($tipo_mensaje === 'exito' && isset($redirigir)): ?>
+    <script>
+        setTimeout(function() {
+            window.location.href = '<?= $redirigir ?>';
+        }, 2000);
+    </script>
     <?php endif; ?>
 
     <div class="registro-card">
