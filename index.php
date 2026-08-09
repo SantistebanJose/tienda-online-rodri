@@ -13,7 +13,7 @@ $db = new DB();
 // ============================================
 // CONFIGURACION DE PAGINACION
 // ============================================
-$items_per_page = 20;
+$items_per_page = 40;
 $current_page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $offset = ($current_page - 1) * $items_per_page;
 
@@ -640,6 +640,36 @@ if ($mostrar !== 'articulos') $filtros_activos++;
     backdrop-filter: blur(10px);
     overflow: hidden;
 }
+.catalog-container {
+    display: block !important; /* antes era grid con columna fija para el sidebar */
+}
+
+.main-catalog-content {
+    width: 100% !important;
+}
+
+.filters-bar {
+    max-height: 0;
+    overflow: hidden;
+    background: #f8f9fa;
+    border-radius: 12px;
+    margin: 0.8rem 0 1.5rem;
+    transition: max-height 0.35s ease, padding 0.35s ease;
+    padding: 0 1.5rem;
+}
+.filters-bar.open { max-height: 500px; padding: 1.5rem; }
+
+.filter-form-top { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: flex-end; }
+.filter-group { display: flex; flex-direction: column; gap: 0.4rem; min-width: 160px; }
+.filter-group label { font-weight: 600; font-size: 0.85rem; color: #495057; }
+.filter-options-inline { display: flex; gap: 1rem; }
+.filter-select-top, .price-input { padding: 0.5rem 0.8rem; border-radius: 8px; border: 1px solid #dee2e6; }
+.toggle-arrow { transition: transform 0.3s ease; margin-left: 0.3rem; }
+.btn-toggle-filters.active .toggle-arrow { transform: rotate(180deg); }
+
+.products-grid.articles-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+}
 
 @keyframes logo-pulse {
     0%, 100% { transform: scale(1);     box-shadow: 0 0 0 0 rgba(255,255,255,0.15); }
@@ -842,30 +872,40 @@ function cerrarModalAniversario() { ... }
 ============================================ -->
 
 <div class="catalog-container">
-    <!-- ============================================
-         SIDEBAR DE FILTROS
-         ============================================ -->
-    <aside class="sidebar-filters" id="sidebarFilters">
-        <div class="sidebar-header">
-            <h2><i class="fas fa-filter"></i> Filtros</h2>
-            <button class="close-sidebar" id="closeSidebar">
-                <i class="fas fa-times"></i>
-            </button>
+   
+    <div class="search-bar-top">
+    <button class="btn-toggle-filters" id="toggleFilters">
+        <i class="fas fa-sliders-h"></i> Filtros
+        <?php if ($filtros_activos > 0): ?>
+            <span class="active-filters-badge"><?= $filtros_activos ?></span>
+        <?php endif; ?>
+        <i class="fas fa-chevron-down toggle-arrow"></i>
+    </button>
+
+    <form method="GET" action="index.php" class="search-form-top">
+        <input type="hidden" name="mostrar" value="<?= htmlspecialchars($mostrar ?? '') ?>">
+        <div class="search-input-wrapper">
+            <i class="fas fa-search"></i>
+            <input type="text" name="buscar" id="liveSearchInput" autocomplete="off"
+                   placeholder="Buscar productos o servicios..."
+                   value="<?= htmlspecialchars($filtro_busqueda ?? '') ?>">
         </div>
-        
-        <form method="GET" action="index.php" class="filter-form-sidebar">
+        <button type="submit" class="btn-search-top">Buscar</button>
+    </form>
+</div>
+
+<!-- Panel de filtros horizontal, colapsado por defecto -->
+    <div class="filters-bar" id="filtersBar">
+        <form method="GET" action="index.php" class="filter-form-top">
             <input type="hidden" name="buscar" value="<?= htmlspecialchars($filtro_busqueda ?? '') ?>">
             <input type="hidden" name="page" value="1">
-            
-            <!-- Filtro: Mostrar -->
-            <div class="filter-section">
-                <h3 class="filter-title">
-                    <i class="fas fa-th-large"></i> Mostrar
-                </h3>
-                <div class="filter-options">
+
+            <div class="filter-group">
+                <label>Mostrar</label>
+                <div class="filter-options-inline">
                     <label class="filter-option">
                         <input type="radio" name="mostrar" value="articulos" <?= $mostrar === 'articulos' ? 'checked' : '' ?>>
-                        <span>Catálogo de Productos</span>
+                        <span>Productos</span>
                     </label>
                     <label class="filter-option">
                         <input type="radio" name="mostrar" value="servicios" <?= $mostrar === 'servicios' ? 'checked' : '' ?>>
@@ -873,97 +913,56 @@ function cerrarModalAniversario() { ... }
                     </label>
                 </div>
             </div>
-            
-            <!-- Filtros solo para artículos -->
-            <div id="articulos-filters" style="<?= $mostrar === 'servicios' ? 'display: none;' : '' ?>">
-                <!-- Filtro: Categoría -->
-                <?php if (!empty($categorias)): ?>
-                <div class="filter-section">
-                    <h3 class="filter-title">
-                        <i class="fas fa-tags"></i> Categoría
-                    </h3>
-                    <select name="categoria" class="filter-select-sidebar">
-                        <option value="">Todas las categorías</option>
-                        <?php foreach ($categorias as $cat): ?>
-                            <option value="<?= $cat['id'] ?>" <?= $filtro_categoria == $cat['id'] ? 'selected' : '' ?>>
-                                <?= htmlspecialchars(strtoupper($cat['nombre'] ?? '')) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <?php endif; ?>
-                
-                <!-- Filtro: Marca -->
-                <?php if (!empty($marcas)): ?>
-                <div class="filter-section">
-                    <h3 class="filter-title">
-                        <i class="fas fa-copyright"></i> Marca
-                    </h3>
-                    <select name="marca" class="filter-select-sidebar">
-                        <option value="">Todas las marcas</option>
-                        <?php foreach ($marcas as $marca): ?>
-                            <option value="<?= htmlspecialchars($marca['marca'] ?? '') ?>"  
-                                    <?= $filtro_marca === ($marca['marca'] ?? '') ? 'selected' : '' ?>>
-                                <?= htmlspecialchars(strtoupper($marca['marca'] ?? '')) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <?php endif; ?>
-                
-                <!-- Filtro: Precio -->
-                <div class="filter-section">
-                    <h3 class="filter-title">
-                        <i class="fas fa-dollar-sign"></i> Rango de Precio
-                    </h3>
-                    <div class="price-inputs">
-                        <input type="number" name="precio_min" placeholder="Mín" 
-                               value="<?= htmlspecialchars($filtro_precio_min ?? '') ?>" 
-                               step="0.01" min="0" class="price-input">
-                         <span class="price-separator">-</span>
-                         <input type="number" name="precio_max" placeholder="Máx" 
-                               value="<?= htmlspecialchars($filtro_precio_max ?? '') ?>" 
-                               step="0.01" min="0" class="price-input">
-                    </div>
+
+            <?php if (!empty($categorias)): ?>
+            <div class="filter-group">
+                <label>Categoría</label>
+                <select name="categoria" class="filter-select-top" id="filtroCategoria">
+                    <option value="">Todas</option>
+                    <?php foreach ($categorias as $cat): ?>
+                        <option value="<?= $cat['id'] ?>" <?= $filtro_categoria == $cat['id'] ? 'selected' : '' ?>>
+                            <?= htmlspecialchars(strtoupper($cat['nombre'] ?? '')) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <?php endif; ?>
+
+            <?php if (!empty($marcas)): ?>
+            <div class="filter-group">
+                <label>Marca</label>
+                <select name="marca" class="filter-select-top" id="filtroMarca">
+                    <option value="">Todas</option>
+                    <?php foreach ($marcas as $marca): ?>
+                        <option value="<?= htmlspecialchars($marca['marca'] ?? '') ?>"
+                                <?= $filtro_marca === ($marca['marca'] ?? '') ? 'selected' : '' ?>>
+                            <?= htmlspecialchars(strtoupper($marca['marca'] ?? '')) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <?php endif; ?>
+
+            <div class="filter-group">
+                <label>Precio</label>
+                <div class="price-inputs">
+                    <input type="number" name="precio_min" placeholder="Mín" value="<?= htmlspecialchars($filtro_precio_min ?? '') ?>" step="0.01" min="0" class="price-input">
+                    <span class="price-separator">-</span>
+                    <input type="number" name="precio_max" placeholder="Máx" value="<?= htmlspecialchars($filtro_precio_max ?? '') ?>" step="0.01" min="0" class="price-input">
                 </div>
             </div>
-            
-            <div class="filter-actions-sidebar">
-                <button type="submit" class="btn-apply">
-                    <i class="fas fa-check"></i> Aplicar
-                </button>
-                <button type="button" class="btn-clear" onclick="window.location.href='index.php';">
-                    <i class="fas fa-redo"></i> Limpiar
-                </button>
+
+            <div class="filter-group filter-actions-top">
+                <button type="submit" class="btn-apply"><i class="fas fa-check"></i> Aplicar</button>
+                <button type="button" class="btn-clear" onclick="window.location.href='index.php';"><i class="fas fa-redo"></i> Limpiar</button>
             </div>
         </form>
-    </aside>
+    </div>
     
     <!-- ============================================
          CONTENIDO PRINCIPAL
          ============================================ -->
-    <div class="main-catalog-content">
-        <!-- Barra de búsqueda y controles -->
-        <div class="search-bar-top">
-            <button class="btn-toggle-filters" id="toggleFilters">
-                <i class="fas fa-sliders-h"></i> Filtros
-                <?php if ($filtros_activos > 0): ?>
-                    <span class="active-filters-badge"><?= $filtros_activos ?></span>
-                <?php endif; ?>
-            </button>
-            
-            <form method="GET" action="index.php" class="search-form-top">
-                <input type="hidden" name="mostrar" value="<?= htmlspecialchars($mostrar ?? '') ?>">
-                <div class="search-input-wrapper">
-                    <i class="fas fa-search"></i>
-                    <input type="text" name="buscar" placeholder="Buscar productos o servicios..." 
-                           value="<?= htmlspecialchars($filtro_busqueda ?? '') ?>">
-                </div>
-                <button type="submit" class="btn-search-top">
-                    Buscar
-                </button>
-            </form>
-        </div>
+    <div class="main-catalog-content">      
         
         <!-- ============================================
              SECCIÓN DE NOVEDADES DESTACADAS
@@ -1022,7 +1021,7 @@ function cerrarModalAniversario() { ... }
             </div>
         </div>
         <?php endif; ?>
-        
+    <div id="resultsContainer">
         <!-- Información de resultados -->
         <div class="results-header">
             <h1><?= $mostrar === 'servicios' ? 'Nuestros Servicios' : 'Nuestro Catálogo de Productos' ?></h1>
@@ -1229,11 +1228,11 @@ function cerrarModalAniversario() { ... }
                 <?php endif; ?>
             </div>
         <?php endif; ?>
+        </div> <!-- cierre de resultsContainer -->
     </div>
 </div>
 
-<!-- Overlay para sidebar en móviles -->
-<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
 
 <!-- Botón flotante de carrito (estilo chatbot) -->
 <a href="carrito.php" class="floating-cart-btn" id="floatingCartBtn" title="Ver carrito">
@@ -1317,46 +1316,63 @@ document.addEventListener('DOMContentLoaded', function() {
         observer.observe(mainBadge, { childList: true, characterData: true, subtree: true });
     }
     
-    // ============================================
-    // MOSTRAR/OCULTAR FILTROS DE ARTÍCULOS
-    // ============================================
-    const radioButtons = document.querySelectorAll('input[name="mostrar"]');
-    const articulosFilters = document.getElementById('articulos-filters');
-    
-    radioButtons.forEach(radio => {
-        radio.addEventListener('change', function() {
-            if (this.value === 'servicios') {
-                articulosFilters.style.display = 'none';
-            } else {
-                articulosFilters.style.display = 'block';
-            }
-        });
-    });
     
     // ============================================
-    // FUNCIONALIDAD DEL SIDEBAR
+    // PANEL DE FILTROS (antes sidebar)
     // ============================================
     const toggleFiltersBtn = document.getElementById('toggleFilters');
-    const closeSidebarBtn = document.getElementById('closeSidebar');
-    const sidebarFilters = document.getElementById('sidebarFilters');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-    
-    function openSidebar() {
-        sidebarFilters.classList.add('active');
-        sidebarOverlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
+    const filtersBar = document.getElementById('filtersBar');
+
+    if (toggleFiltersBtn && filtersBar) {
+        toggleFiltersBtn.addEventListener('click', function () {
+            filtersBar.classList.toggle('open');
+            this.classList.toggle('active');
+        });
     }
-    
-    function closeSidebar() {
-        sidebarFilters.classList.remove('active');
-        sidebarOverlay.classList.remove('active');
-        document.body.style.overflow = '';
+
+// ============================================
+    // BÚSQUEDA EN TIEMPO REAL
+    // ============================================
+    const liveSearchInput = document.getElementById('liveSearchInput');
+    const resultsContainer = document.getElementById('resultsContainer');
+    let searchTimeout = null;
+
+    function ejecutarBusquedaEnVivo() {
+        // Si el usuario está viendo Servicios, no interceptamos con AJAX de productos
+        const mostrarServicios = document.querySelector('input[name="mostrar"][value="servicios"]:checked');
+        if (mostrarServicios) return; // deja que el form normal (Aplicar/Buscar) se encargue
+
+        const params = new URLSearchParams();
+        params.set('buscar', liveSearchInput.value.trim());
+        params.set('mostrar', 'articulos');
+        const cat = document.getElementById('filtroCategoria');
+        const marca = document.getElementById('filtroMarca');
+        if (cat && cat.value) params.set('categoria', cat.value);
+        if (marca && marca.value) params.set('marca', marca.value);
+
+        resultsContainer.style.opacity = '0.5';
+        fetch('ajax_search.php?' + params.toString())
+            .then(r => r.text())
+            .then(html => {
+                resultsContainer.innerHTML = html;
+                resultsContainer.style.opacity = '1';
+                setupImageFallback();
+            })
+            .catch(() => { resultsContainer.style.opacity = '1'; });
     }
-    
-    if (toggleFiltersBtn) toggleFiltersBtn.addEventListener('click', openSidebar);
-    if (closeSidebarBtn)  closeSidebarBtn.addEventListener('click', closeSidebar);
-    if (sidebarOverlay)   sidebarOverlay.addEventListener('click', closeSidebar);
-    
+
+    if (liveSearchInput) {
+        liveSearchInput.addEventListener('input', function () {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(ejecutarBusquedaEnVivo, 350);
+        });
+        liveSearchInput.closest('form').addEventListener('submit', function (e) {
+            const mostrarServicios = document.querySelector('input[name="mostrar"][value="servicios"]:checked');
+            if (mostrarServicios) return; // deja pasar el submit normal
+            e.preventDefault();
+            ejecutarBusquedaEnVivo();
+        });
+    }
     // ============================================
     // CARRUSEL DE IMÁGENES
     // ============================================

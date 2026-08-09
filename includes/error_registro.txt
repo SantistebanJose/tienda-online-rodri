@@ -1,0 +1,2 @@
+2026-06-06 14:11:58 - SQLSTATE[23505]: Unique violation: 7 ERROR:  duplicate key value violates unique constraint "persona_web_tipo_persona_key"
+DETAIL:  Key (tipo_persona)=(cliente) already exists.
