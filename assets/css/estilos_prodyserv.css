@@ -3626,7 +3626,9 @@ html {
         height: 50px;
     }
 }
-/* ============================================
-   CARRUSEL DE NOVEDADES EN LA PÁGINA PRINCIPAL
-   ============================================ */
-
+/* Tarjetas cargadas por búsqueda en vivo: sin animación de entrada */
+.no-entrance-animation {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+}

@@ -88,7 +88,7 @@ $articulos = $stmt->fetchAll();
             $imagenes = procesarImagenesArticulo($articulo['json_url_img']);
             $primera_imagen = !empty($imagenes) ? $imagenes[0]['url'] : 'assets/img/productos/placeholder.jpg';
         ?>
-            <div class="product-card article-card">
+            <div class="product-card article-card no-entrance-animation">
                 <div class="product-image-container">
                     <a href="producto_detalle.php?id=<?= $articulo['id'] ?>" class="product-image">
                         <img src="<?= htmlspecialchars($primera_imagen) ?>"
