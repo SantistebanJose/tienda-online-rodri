@@ -593,19 +593,28 @@ if ($mostrar !== 'articulos') $filtros_activos++;
     height: 130px;
 }
 
-/* Anillo giratorio exterior */
+/* ── Imagen del logo circular ── */
+.loading-logo-wrapper img {
+    width: 130px;
+    height: 130px;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+}
+
+/* ── Anillo giratorio exterior ── */
 .loading-logo-wrapper::before {
     content: '';
     position: absolute;
-    inset: -6px; /* un poco más grande que el círculo */
+    inset: -6px;
     border-radius: 50%;
     border: 3px solid transparent;
     border-top-color: rgba(255, 255, 255, 0.9);
     border-right-color: rgba(255, 255, 255, 0.4);
-    animation: spin 1.2s linear infinite;
+    animation: spin 3s linear infinite;
 }
 
-/* Segundo anillo giratorio (sentido contrario, más lento) */
+/* ── Segundo anillo giratorio ── */
 .loading-logo-wrapper::after {
     content: '';
     position: absolute;
@@ -616,7 +625,6 @@ if ($mostrar !== 'articulos') $filtros_activos++;
     border-left-color: rgba(255, 255, 255, 0.2);
     animation: spin-reverse 2s linear infinite;
 }
-
 @keyframes spin {
     to { transform: rotate(360deg); }
 }

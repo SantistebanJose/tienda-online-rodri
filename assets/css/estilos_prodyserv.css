@@ -102,7 +102,22 @@ h1, h2, h3 { font-family: 'Poppins', 'Inter', sans-serif; }
     text-decoration: none;
 }
 
-.logo-img { height: 60px; width: auto; object-fit: contain; }
+.logo-img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    display: block;
+}
+
+.footer-logo-img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+}
 
 .nav-menu { display: flex; list-style: none; gap: 1rem; align-items: center; }
 
